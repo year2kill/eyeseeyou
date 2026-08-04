@@ -17,8 +17,47 @@
       background-size: cover;
       overflow: hidden;
     }
+
+    @keyframes float {
+      0% {
+        transform: translateY(0px);
+      }
+
+      50% {
+        transform: translateY(-15px);
+      }
+
+      100% {
+        transform: translateY(0px);
+      }
+    }
+
+    .logo {
+      width: 520px;
+      max-width: 85%;
+      height: auto;
+      animation: float 3s ease-in-out infinite;
+      cursor: pointer;
+      display: block;
+      margin: 0 auto;
+    }
+
+    .logo-container {
+      padding-top: 10vh;
+      text-align: center;
+    }
   </style>
 </head>
 
-<body></body>
+<body>
+  <div class="logo-container">
+    <a href="index3.html">
+      <img
+        src="y2k2026.png"
+        alt="YEAR2KILL"
+        class="logo"
+      >
+    </a>
+  </div>
+</body>
 </html>
