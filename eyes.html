@@ -4,30 +4,40 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Floating Eyes</title>
+<title>Watching Eyes</title>
 
 <style>
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-html,body{
-    width:100%;
-    height:100%;
-    overflow:hidden;
-    background:#000;
+html,
+body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: black;
 }
 
-.eye{
-    position:fixed;
-    width:140px;
-    height:140px;
-    pointer-events:none;
-    user-select:none;
-    will-change:transform;
-    filter:drop-shadow(0 0 12px rgba(255,0,0,.15));
+.eye {
+    position: fixed;
+    left: 0;
+    top: 0;
+
+    width: 140px;
+    height: 140px;
+
+    object-fit: contain;
+
+    pointer-events: none;
+    user-select: none;
+
+    transform-origin: center;
+    will-change: transform;
+
+    filter: drop-shadow(0 0 12px rgba(255, 0, 0, 0.15));
 }
 </style>
 </head>
@@ -35,7 +45,6 @@ html,body{
 <body>
 
 <script>
-
 const EYE_COUNT = 15;
 
 const MIN_SIZE = 70;
@@ -44,121 +53,214 @@ const MAX_SIZE = 170;
 const MIN_SPEED = 0.4;
 const MAX_SPEED = 1.8;
 
+/*
+Controls how strongly the eyes turn toward the cursor.
+
+1 = immediately follows cursor
+0.1 = slow, creepy movement
+*/
+const LOOK_SPEED = 0.08;
+
 const eyes = [];
 
-function rand(min,max){
-    return Math.random()*(max-min)+min;
+/*
+Start the cursor in the middle of the screen.
+*/
+const mouse = {
+    x: window.innerWidth / 2,
+    y: window.innerHeight / 2,
+    active: false
+};
+
+function randomBetween(min, max) {
+    return Math.random() * (max - min) + min;
 }
 
-function createEye(){
+function createEye() {
+    const image = document.createElement("img");
 
-    const img = document.createElement("img");
+    image.src = "eyeball.png";
+    image.className = "eye";
+    image.alt = "";
+    image.draggable = false;
 
-    img.src = "eyeball.png";
-    img.className = "eye";
-    img.draggable = false;
+    const size = randomBetween(MIN_SIZE, MAX_SIZE);
 
-    const size = rand(MIN_SIZE,MAX_SIZE);
+    image.style.width = `${size}px`;
+    image.style.height = `${size}px`;
 
-    img.style.width = size + "px";
-    img.style.height = size + "px";
+    document.body.appendChild(image);
 
-    document.body.appendChild(img);
-
-    const angle = rand(0,Math.PI*2);
-    const speed = rand(MIN_SPEED,MAX_SPEED);
+    const movementAngle = randomBetween(0, Math.PI * 2);
+    const speed = randomBetween(MIN_SPEED, MAX_SPEED);
 
     eyes.push({
+        element: image,
 
-        element:img,
+        size,
 
-        size:size,
+        x: randomBetween(
+            0,
+            Math.max(0, window.innerWidth - size)
+        ),
 
-        x:rand(0,window.innerWidth-size),
-        y:rand(0,window.innerHeight-size),
+        y: randomBetween(
+            0,
+            Math.max(0, window.innerHeight - size)
+        ),
 
-        vx:Math.cos(angle)*speed,
-        vy:Math.sin(angle)*speed,
+        velocityX: Math.cos(movementAngle) * speed,
+        velocityY: Math.sin(movementAngle) * speed,
 
-        rotation:rand(0,360),
-        rotationSpeed:rand(-0.15,0.15),
+        currentLookAngle: 0,
 
-        floatOffset:rand(0,Math.PI*2),
-        floatSpeed:rand(.01,.025),
-        floatAmount:rand(4,12)
-
+        floatOffset: randomBetween(0, Math.PI * 2),
+        floatSpeed: randomBetween(0.01, 0.025),
+        floatAmount: randomBetween(4, 12)
     });
-
 }
 
-for(let i=0;i<EYE_COUNT;i++){
-    createEye();
+/*
+Track mouse movement on desktop.
+*/
+window.addEventListener("mousemove", event => {
+    mouse.x = event.clientX;
+    mouse.y = event.clientY;
+    mouse.active = true;
+});
+
+/*
+Also works when dragging a finger around on mobile.
+*/
+window.addEventListener(
+    "touchmove",
+    event => {
+        const touch = event.touches[0];
+
+        if (!touch) return;
+
+        mouse.x = touch.clientX;
+        mouse.y = touch.clientY;
+        mouse.active = true;
+    },
+    { passive: true }
+);
+
+function shortestAngleDifference(currentAngle, targetAngle) {
+    let difference = targetAngle - currentAngle;
+
+    while (difference > 180) {
+        difference -= 360;
+    }
+
+    while (difference < -180) {
+        difference += 360;
+    }
+
+    return difference;
 }
 
-function animate(time){
+function animate(time) {
+    for (const eye of eyes) {
+        /*
+        Continue normal bouncing movement.
+        */
+        eye.x += eye.velocityX;
+        eye.y += eye.velocityY;
 
-    for(const eye of eyes){
+        const maxX = window.innerWidth - eye.size;
+        const maxY = window.innerHeight - eye.size;
 
-        eye.x += eye.vx;
-        eye.y += eye.vy;
-
-        eye.rotation += eye.rotationSpeed;
-
-        const maxX = window.innerWidth-eye.size;
-        const maxY = window.innerHeight-eye.size;
-
-        if(eye.x<=0){
-            eye.x=0;
-            eye.vx=Math.abs(eye.vx);
+        if (eye.x <= 0) {
+            eye.x = 0;
+            eye.velocityX = Math.abs(eye.velocityX);
         }
 
-        if(eye.x>=maxX){
-            eye.x=maxX;
-            eye.vx=-Math.abs(eye.vx);
+        if (eye.x >= maxX) {
+            eye.x = maxX;
+            eye.velocityX = -Math.abs(eye.velocityX);
         }
 
-        if(eye.y<=0){
-            eye.y=0;
-            eye.vy=Math.abs(eye.vy);
+        if (eye.y <= 0) {
+            eye.y = 0;
+            eye.velocityY = Math.abs(eye.velocityY);
         }
 
-        if(eye.y>=maxY){
-            eye.y=maxY;
-            eye.vy=-Math.abs(eye.vy);
+        if (eye.y >= maxY) {
+            eye.y = maxY;
+            eye.velocityY = -Math.abs(eye.velocityY);
         }
 
-        const floatY =
-            Math.sin(time*eye.floatSpeed+eye.floatOffset)
-            *eye.floatAmount;
+        const floatingY =
+            Math.sin(
+                time * eye.floatSpeed + eye.floatOffset
+            ) * eye.floatAmount;
 
-        eye.element.style.transform =
-            `translate(${eye.x}px,${eye.y+floatY}px) rotate(${eye.rotation}deg)`;
+        /*
+        Find the center of this individual eye.
+        */
+        const eyeCenterX = eye.x + eye.size / 2;
+        const eyeCenterY =
+            eye.y + floatingY + eye.size / 2;
 
+        /*
+        Calculate the angle between the eye and cursor.
+        */
+        const cursorAngle =
+            Math.atan2(
+                mouse.y - eyeCenterY,
+                mouse.x - eyeCenterX
+            ) * 180 / Math.PI;
+
+        /*
+        The pupil in this PNG faces forward rather than toward
+        the right side, so rotation may be subtle.
+
+        This smoothing creates a delayed, organic reaction.
+        */
+        const angleDifference = shortestAngleDifference(
+            eye.currentLookAngle,
+            cursorAngle
+        );
+
+        eye.currentLookAngle +=
+            angleDifference * LOOK_SPEED;
+
+        eye.element.style.transform = `
+            translate3d(
+                ${eye.x}px,
+                ${eye.y + floatingY}px,
+                0
+            )
+            rotate(${eye.currentLookAngle}deg)
+        `;
     }
 
     requestAnimationFrame(animate);
 }
 
-requestAnimationFrame(animate);
+for (let i = 0; i < EYE_COUNT; i++) {
+    createEye();
+}
 
-window.addEventListener("resize",()=>{
+window.addEventListener("resize", () => {
+    mouse.x = window.innerWidth / 2;
+    mouse.y = window.innerHeight / 2;
 
-    for(const eye of eyes){
-
-        eye.x=Math.min(
+    for (const eye of eyes) {
+        eye.x = Math.min(
             eye.x,
-            window.innerWidth-eye.size
+            Math.max(0, window.innerWidth - eye.size)
         );
 
-        eye.y=Math.min(
+        eye.y = Math.min(
             eye.y,
-            window.innerHeight-eye.size
+            Math.max(0, window.innerHeight - eye.size)
         );
-
     }
-
 });
 
+requestAnimationFrame(animate);
 </script>
 
 </body>
