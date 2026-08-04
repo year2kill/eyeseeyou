@@ -1,369 +1,1215 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
+<meta charset="UTF-8">
 
-  <title>YEAR2KILL</title>
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+>
 
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
+<title>YEAR2KILL</title>
+
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  html,
+  body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  body {
+    position: relative;
+
+    background:
+      url("eyesurgery.png")
+      no-repeat
+      center center;
+
+    background-size: cover;
+
+    font-family:
+      "Courier New",
+      "Liberation Mono",
+      monospace;
+  }
+
+  /* Darkens the background slightly behind everything. */
+  body::before {
+    content: "";
+
+    position: fixed;
+    inset: 0;
+
+    background: rgba(0, 0, 0, 0.12);
+
+    pointer-events: none;
+
+    z-index: 0;
+  }
+
+  /* ========================================
+     FLOATING YEAR2KILL LOGO
+  ======================================== */
+
+  @keyframes logoFloat {
+    0% {
+      transform: translateY(0);
     }
 
-    html,
-    body {
-      width: 100%;
-      height: 100%;
+    50% {
+      transform: translateY(-13px);
     }
 
-    body {
-      background: url("eyesurgery.png") no-repeat center center fixed;
-      background-size: cover;
-      overflow: hidden;
+    100% {
+      transform: translateY(0);
+    }
+  }
+
+  .logo-container {
+    position: fixed;
+
+    top: max(26px, env(safe-area-inset-top));
+    left: 50%;
+
+    transform: translateX(-50%);
+
+    width: 100%;
+
+    text-align: center;
+
+    z-index: 30;
+
+    pointer-events: none;
+  }
+
+  .logo-container a {
+    display: inline-block;
+    pointer-events: auto;
+  }
+
+  .logo {
+    display: block;
+
+    width: min(520px, 72vw);
+    height: auto;
+
+    animation:
+      logoFloat
+      3s
+      ease-in-out
+      infinite;
+
+    filter:
+      drop-shadow(
+        0 7px 12px
+        rgba(0, 0, 0, 0.8)
+      );
+  }
+
+  /* ========================================
+     FLOATING PNG EYEBALLS
+  ======================================== */
+
+  .floating-eye {
+    position: fixed;
+
+    left: 0;
+    top: 0;
+
+    object-fit: contain;
+
+    pointer-events: none;
+    user-select: none;
+
+    transform-origin: center;
+    will-change: transform;
+
+    filter:
+      drop-shadow(
+        0 0 12px
+        rgba(255, 0, 0, 0.16)
+      );
+
+    z-index: 2;
+  }
+
+  /* ========================================
+     TERMINAL
+  ======================================== */
+
+  .terminal {
+    position: fixed;
+
+    left: 50%;
+    top: 58%;
+
+    transform:
+      translate(-50%, -50%);
+
+    width: min(850px, 92vw);
+    height: min(470px, 52vh);
+
+    display: flex;
+    flex-direction: column;
+
+    overflow: hidden;
+
+    background: #000000;
+
+    border: 1px solid #777777;
+
+    box-shadow:
+      0 22px 65px
+      rgba(0, 0, 0, 0.95),
+
+      0 0 0 2px
+      rgba(0, 0, 0, 0.65);
+
+    z-index: 20;
+  }
+
+  .title-bar {
+    position: relative;
+
+    min-height: 33px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0 80px;
+
+    background:
+      linear-gradient(
+        to bottom,
+        #6a6a6a,
+        #383838
+      );
+
+    color: #ffffff;
+
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+  }
+
+  .window-controls {
+    position: absolute;
+    left: 10px;
+
+    display: flex;
+    gap: 8px;
+  }
+
+  .window-control {
+    width: 15px;
+    height: 15px;
+
+    border: 2px solid #777777;
+    border-radius: 50%;
+
+    background: #292929;
+
+    box-shadow:
+      inset 0 1px 2px
+      rgba(255, 255, 255, 0.18),
+
+      0 1px 2px
+      rgba(0, 0, 0, 0.8);
+  }
+
+  .menu-bar {
+    min-height: 31px;
+
+    display: flex;
+    align-items: center;
+    gap: 24px;
+
+    padding: 0 12px;
+
+    background: #282828;
+    color: #ffffff;
+
+    border-bottom: 1px solid #111111;
+
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+  }
+
+  .terminal-screen {
+    position: relative;
+
+    flex: 1;
+    min-height: 0;
+
+    overflow: hidden;
+
+    background: #000000;
+  }
+
+  .startup-line {
+    position: absolute;
+
+    top: 11px;
+    left: 12px;
+
+    color: #00ff32;
+
+    font-size: 13px;
+
+    white-space: nowrap;
+
+    z-index: 3;
+  }
+
+  .startup-command {
+    color: #dddddd;
+  }
+
+  .terminal-status {
+    position: absolute;
+
+    top: 45px;
+    right: 15px;
+
+    color: #00ff32;
+
+    font-size: 11px;
+    line-height: 1.4;
+
+    text-align: right;
+
+    opacity: 0.72;
+
+    z-index: 3;
+  }
+
+  .ascii-eye {
+    position: absolute;
+
+    left: 50%;
+    top: 53%;
+
+    margin: 0;
+
+    color: #eeeeee;
+
+    font-family:
+      "Courier New",
+      "Liberation Mono",
+      monospace;
+
+    font-size: clamp(5px, 1.05vw, 10px);
+    font-weight: bold;
+
+    line-height: 0.88;
+    letter-spacing: 0;
+
+    white-space: pre;
+
+    transform:
+      translate(-50%, -50%);
+
+    transition:
+      left 1.6s ease-in-out,
+      top 1.6s ease-in-out,
+      opacity 0.08s linear;
+
+    text-shadow:
+      0 0 4px
+      rgba(255, 255, 255, 0.18);
+
+    user-select: none;
+    pointer-events: none;
+  }
+
+  .ascii-eye.flicker {
+    opacity: 0.45;
+  }
+
+  .terminal-prompt {
+    position: absolute;
+
+    left: 12px;
+    bottom: 11px;
+
+    color: #00ff32;
+
+    font-size: 13px;
+
+    white-space: nowrap;
+
+    z-index: 3;
+  }
+
+  .terminal-cursor {
+    display: inline-block;
+
+    width: 8px;
+    height: 16px;
+
+    margin-left: 4px;
+
+    background: #00ff32;
+
+    vertical-align: -3px;
+
+    animation:
+      cursorBlink
+      0.82s
+      steps(1)
+      infinite;
+  }
+
+  @keyframes cursorBlink {
+    0%,
+    48% {
+      opacity: 1;
     }
 
-    @keyframes float {
-      0% {
-        transform: translateY(0px);
-      }
+    49%,
+    100% {
+      opacity: 0;
+    }
+  }
 
-      50% {
-        transform: translateY(-15px);
-      }
+  /* ========================================
+     PHONE LAYOUT
+  ======================================== */
 
-      100% {
-        transform: translateY(0px);
-      }
+  @media (max-width: 650px) {
+    .logo-container {
+      top: max(19px, env(safe-area-inset-top));
     }
 
     .logo {
-      width: 520px;
-      max-width: 85%;
-      height: auto;
-      animation: float 3s ease-in-out infinite;
-      cursor: pointer;
-      display: block;
-      margin: 0 auto;
+      width: min(440px, 76vw);
     }
 
-    .logo-container {
-      padding-top: 10vh;
-      text-align: center;
-      position: relative;
-      z-index: 2;
+    .terminal {
+      top: 62%;
+
+      width: 94vw;
+      height: min(405px, 48vh);
     }
 
-    .eye {
-      position: fixed;
-      left: 0;
-      top: 0;
+    .title-bar {
+      min-height: 30px;
+      font-size: 12px;
+    }
 
-      width: 140px;
-      height: 140px;
+    .menu-bar {
+      min-height: 28px;
 
-      object-fit: contain;
+      gap: 13px;
 
-      pointer-events: none;
-      user-select: none;
+      font-size: 11px;
+    }
 
-      transform-origin: center;
-      will-change: transform;
+    .menu-bar span:nth-last-child(-n + 2) {
+      display: none;
+    }
 
-      filter: drop-shadow(
-        0 0 12px rgba(255, 0, 0, 0.15)
+    .startup-line,
+    .terminal-prompt {
+      font-size: 11px;
+    }
+
+    .terminal-status {
+      display: none;
+    }
+
+    .ascii-eye {
+      top: 52%;
+
+      font-size: clamp(
+        3.8px,
+        1.28vw,
+        6.5px
       );
-
-      z-index: 1;
     }
-  </style>
+  }
+
+  @media (max-height: 650px) {
+    .logo-container {
+      top: 10px;
+    }
+
+    .logo {
+      width: min(360px, 55vw);
+    }
+
+    .terminal {
+      top: 61%;
+      height: 55vh;
+    }
+  }
+</style>
 </head>
 
 <body>
 
-  <div class="logo-container">
-    <a href="index3.html">
-      <img
-        src="y2k2026.png"
-        alt="YEAR2KILL"
-        class="logo"
-      >
-    </a>
+<div class="logo-container">
+  <a href="index3.html">
+    <img
+      src="y2k2026.png"
+      alt="YEAR2KILL"
+      class="logo"
+    >
+  </a>
+</div>
+
+<div class="terminal">
+
+  <div class="title-bar">
+
+    <div class="window-controls">
+      <div class="window-control"></div>
+      <div class="window-control"></div>
+      <div class="window-control"></div>
+    </div>
+
+    watcher@unknown: ~
   </div>
 
-  <script>
-    const EYE_COUNT = 15;
+  <div class="menu-bar">
+    <span>File</span>
+    <span>Edit</span>
+    <span>View</span>
+    <span>Search</span>
+    <span>Terminal</span>
+    <span>Help</span>
+  </div>
 
-    const MIN_SIZE = 70;
-    const MAX_SIZE = 170;
+  <div class="terminal-screen">
 
-    const MIN_SPEED = 0.4;
-    const MAX_SPEED = 1.8;
+    <div class="startup-line">
+      watcher@unknown:~$
+      <span class="startup-command">./observe</span>
+    </div>
 
-    /*
-    Controls how strongly the eyes turn toward the cursor.
+    <div
+      class="terminal-status"
+      id="terminalStatus"
+    >
+      OPTICAL FEED: ACTIVE<br>
+      SUBJECT: DETECTED
+    </div>
 
-    1 = immediately follows cursor
-    0.1 = slow, creepy movement
-    */
-    const LOOK_SPEED = 0.08;
+    <pre
+      class="ascii-eye"
+      id="asciiEye"
+      aria-label="Animated ASCII eye"
+    ></pre>
 
-    const eyes = [];
+    <div class="terminal-prompt">
+      watcher@unknown:~$<span class="terminal-cursor"></span>
+    </div>
 
-    /*
-    Start the cursor in the middle of the screen.
-    */
-    const mouse = {
-      x: window.innerWidth / 2,
-      y: window.innerHeight / 2,
-      active: false
-    };
+  </div>
+</div>
 
-    function randomBetween(min, max) {
-      return Math.random() * (max - min) + min;
-    }
+<script>
+"use strict";
 
-    function createEye() {
-      const image = document.createElement("img");
+/* ========================================
+   FLOATING PNG EYEBALLS
+======================================== */
 
-      image.src = "eyeball.png";
-      image.className = "eye";
-      image.alt = "";
-      image.draggable = false;
+const EYE_COUNT = 15;
 
-      const size = randomBetween(
-        MIN_SIZE,
-        MAX_SIZE
-      );
+const MIN_SIZE = 70;
+const MAX_SIZE = 170;
 
-      image.style.width = `${size}px`;
-      image.style.height = `${size}px`;
+const MIN_SPEED = 0.4;
+const MAX_SPEED = 1.8;
 
-      document.body.appendChild(image);
+const LOOK_SPEED = 0.08;
 
-      const movementAngle = randomBetween(
+const floatingEyes = [];
+
+const mouse = {
+  x: window.innerWidth / 2,
+  y: window.innerHeight / 2
+};
+
+function randomBetween(min, max) {
+  return Math.random() * (max - min) + min;
+}
+
+function createFloatingEye() {
+  const image =
+    document.createElement("img");
+
+  image.src = "eyeball.png";
+  image.className = "floating-eye";
+  image.alt = "";
+  image.draggable = false;
+
+  const size =
+    randomBetween(
+      MIN_SIZE,
+      MAX_SIZE
+    );
+
+  image.style.width =
+    `${size}px`;
+
+  image.style.height =
+    `${size}px`;
+
+  document.body.appendChild(image);
+
+  const movementAngle =
+    randomBetween(
+      0,
+      Math.PI * 2
+    );
+
+  const speed =
+    randomBetween(
+      MIN_SPEED,
+      MAX_SPEED
+    );
+
+  floatingEyes.push({
+    element: image,
+
+    size,
+
+    x: randomBetween(
+      0,
+      Math.max(
+        0,
+        window.innerWidth - size
+      )
+    ),
+
+    y: randomBetween(
+      0,
+      Math.max(
+        0,
+        window.innerHeight - size
+      )
+    ),
+
+    velocityX:
+      Math.cos(movementAngle) *
+      speed,
+
+    velocityY:
+      Math.sin(movementAngle) *
+      speed,
+
+    currentLookAngle: 0,
+
+    floatOffset:
+      randomBetween(
         0,
         Math.PI * 2
+      ),
+
+    floatSpeed:
+      randomBetween(
+        0.01,
+        0.025
+      ),
+
+    floatAmount:
+      randomBetween(
+        4,
+        12
+      )
+  });
+}
+
+window.addEventListener(
+  "mousemove",
+  event => {
+    mouse.x = event.clientX;
+    mouse.y = event.clientY;
+  }
+);
+
+window.addEventListener(
+  "touchmove",
+  event => {
+    const touch =
+      event.touches[0];
+
+    if (!touch) {
+      return;
+    }
+
+    mouse.x = touch.clientX;
+    mouse.y = touch.clientY;
+  },
+  {
+    passive: true
+  }
+);
+
+function shortestAngleDifference(
+  currentAngle,
+  targetAngle
+) {
+  let difference =
+    targetAngle - currentAngle;
+
+  while (difference > 180) {
+    difference -= 360;
+  }
+
+  while (difference < -180) {
+    difference += 360;
+  }
+
+  return difference;
+}
+
+function animateFloatingEyes(time) {
+  for (const eye of floatingEyes) {
+    eye.x += eye.velocityX;
+    eye.y += eye.velocityY;
+
+    const maxX =
+      Math.max(
+        0,
+        window.innerWidth - eye.size
       );
 
-      const speed = randomBetween(
-        MIN_SPEED,
-        MAX_SPEED
+    const maxY =
+      Math.max(
+        0,
+        window.innerHeight - eye.size
       );
 
-      eyes.push({
-        element: image,
+    if (eye.x <= 0) {
+      eye.x = 0;
+      eye.velocityX =
+        Math.abs(eye.velocityX);
+    }
 
-        size,
+    if (eye.x >= maxX) {
+      eye.x = maxX;
+      eye.velocityX =
+        -Math.abs(eye.velocityX);
+    }
 
-        x: randomBetween(
-          0,
-          Math.max(
-            0,
-            window.innerWidth - size
-          )
-        ),
+    if (eye.y <= 0) {
+      eye.y = 0;
+      eye.velocityY =
+        Math.abs(eye.velocityY);
+    }
 
-        y: randomBetween(
-          0,
-          Math.max(
-            0,
-            window.innerHeight - size
-          )
-        ),
+    if (eye.y >= maxY) {
+      eye.y = maxY;
+      eye.velocityY =
+        -Math.abs(eye.velocityY);
+    }
 
-        velocityX:
-          Math.cos(movementAngle) * speed,
+    const floatingY =
+      Math.sin(
+        time * eye.floatSpeed +
+        eye.floatOffset
+      ) *
+      eye.floatAmount;
 
-        velocityY:
-          Math.sin(movementAngle) * speed,
+    const centerX =
+      eye.x +
+      eye.size / 2;
 
-        currentLookAngle: 0,
+    const centerY =
+      eye.y +
+      floatingY +
+      eye.size / 2;
 
-        floatOffset: randomBetween(
-          0,
-          Math.PI * 2
-        ),
+    const targetAngle =
+      Math.atan2(
+        mouse.y - centerY,
+        mouse.x - centerX
+      ) *
+      180 /
+      Math.PI;
 
-        floatSpeed: randomBetween(
-          0.01,
-          0.025
-        ),
+    const difference =
+      shortestAngleDifference(
+        eye.currentLookAngle,
+        targetAngle
+      );
 
-        floatAmount: randomBetween(
-          4,
-          12
+    eye.currentLookAngle +=
+      difference *
+      LOOK_SPEED;
+
+    eye.element.style.transform = `
+      translate3d(
+        ${eye.x}px,
+        ${eye.y + floatingY}px,
+        0
+      )
+      rotate(
+        ${eye.currentLookAngle}deg
+      )
+    `;
+  }
+
+  requestAnimationFrame(
+    animateFloatingEyes
+  );
+}
+
+for (
+  let index = 0;
+  index < EYE_COUNT;
+  index++
+) {
+  createFloatingEye();
+}
+
+/* ========================================
+   ASCII EYE FRAMES
+======================================== */
+
+const asciiEye =
+  document.getElementById(
+    "asciiEye"
+  );
+
+const terminalStatus =
+  document.getElementById(
+    "terminalStatus"
+  );
+
+const rawFrames = {
+  center: [
+    "                      ...'',;;:cccccccc:;;,''...",
+    "                 ..,;;::cccc::::cccccloooooolc:,'..",
+    "              .',;;:::::;:loodxkOkkxxkdoccccc:;,'...",
+    "          ..,;;;:::::coxldKNWMMMMMMMMWNKkkdolcccc:;,..",
+    "       ..,;;;::;lxo:..:dXWMMMMMMMMMMWNKloOXNNNXOkoc:coo;.",
+    "    ..,;;;;;;:ldl'    .kWMMMWXXNWMMMMMXd..':dOXWWNOd::lkd,",
+    "  ..,;;;;;;:loc.       lKMMMMlco0NWN0o:      ':lxO0X0l,cxo.",
+    "..',;;;;;;cooc.        cONMMXxXMMMMMWk.         ,ddxO0occl:.",
+    ".;;;;;;;:odc.           xOKKXKNMMMMMMXd.         .cxxkkkdl:..",
+    ",;;;;;;:dxolc;            .lx0WMMMMMMW0o.        ;looolllol;.",
+    ";;;;;;:lcloolc;..             o0NMMMMN0d,         ;clc:;;;;;;;.",
+    ";;;;;;;:::::;;cccc:;;,''... .:loddoool:,,;;clllolc:;;,,;;;;;;;;;.",
+    ".;;;;;;...''',;;;::cccccllllooooclllllccc:c:;;;,''.......;;;;;;;.",
+    "  ..'',;;;;;::::ccccccclllloooocllllcccc::;;,''............''...",
+    "      ....'',;;;;;;;;;;;;;;;;;;;;;;;;;;;;,''....",
+    "            .............................."
+  ],
+
+  left: [
+    "                      ...'',;;:cccccccc:;;,''...",
+    "                 ..,;;::cccc::::cccccloooooolc:,'..",
+    "              .',;;:::::;:loodxkOkkxxkdoccccc:;,'...",
+    "          ..,;;;:::::coxldKNWMMMMMMMMWNKkkdolcccc:;,..",
+    "       ..,;;;::;lxo:..:dXWMMMMMMMMMMWNKloOXNNNXOkoc:coo;.",
+    "    ..,;;;;;;:ldl'  .kWMMMWXXNWMMMMMXd..':dOXWWNOd::lkd,",
+    "  ..,;;;;;;:loc.   lKMMMMlco0NWN0o:          ':lxO0X0l,cxo.",
+    "..',;;;;;;cooc.    cONMMXxXMMMMMWk.              ,ddxO0occl:.",
+    ".;;;;;;;:odc.       xOKKXKNMMMMMMXd.              .cxxkkkdl:..",
+    ",;;;;;;:dxolc;       .lx0WMMMMMMW0o.              ;looolllol;.",
+    ";;;;;;:lcloolc;..       o0NMMMMN0d,               ;clc:;;;;;;;.",
+    ";;;;;;;:::::;;cccc:;;,''... .:loddoool:,,;;clllolc:;;,,;;;;;;;;;.",
+    ".;;;;;;...''',;;;::cccccllllooooclllllccc:c:;;;,''.......;;;;;;;.",
+    "  ..'',;;;;;::::ccccccclllloooocllllcccc::;;,''............''...",
+    "      ....'',;;;;;;;;;;;;;;;;;;;;;;;;;;;;,''....",
+    "            .............................."
+  ],
+
+  right: [
+    "                      ...'',;;:cccccccc:;;,''...",
+    "                 ..,;;::cccc::::cccccloooooolc:,'..",
+    "              .',;;:::::;:loodxkOkkxxkdoccccc:;,'...",
+    "          ..,;;;:::::coxldKNWMMMMMMMMWNKkkdolcccc:;,..",
+    "       ..,;;;::;lxo:..:dXWMMMMMMMMMMWNKloOXNNNXOkoc:coo;.",
+    "    ..,;;;;;;:ldl'    .kWMMMWXXNWMMMMMXd..':dOXWWNOd::lkd,",
+    "  ..,;;;;;;:loc.           lKMMMMlco0NWN0o: ':lxO0X0l,cxo.",
+    "..',;;;;;;cooc.            cONMMXxXMMMMMWk.    ,ddxO0occl:.",
+    ".;;;;;;;:odc.                xOKKXKNMMMMMMXd.    .cxxkkkdl:..",
+    ",;;;;;;:dxolc;                .lx0WMMMMMMW0o.    ;looolllol;.",
+    ";;;;;;:lcloolc;..                o0NMMMMN0d,     ;clc:;;;;;;;.",
+    ";;;;;;;:::::;;cccc:;;,''... .:loddoool:,,;;clllolc:;;,,;;;;;;;;;.",
+    ".;;;;;;...''',;;;::cccccllllooooclllllccc:c:;;;,''.......;;;;;;;.",
+    "  ..'',;;;;;::::ccccccclllloooocllllcccc::;;,''............''...",
+    "      ....'',;;;;;;;;;;;;;;;;;;;;;;;;;;;;,''....",
+    "            .............................."
+  ],
+
+  halfBlink: [
+    "                      ...'',;;:cccccccc:;;,''...",
+    "                 ..,;;::cccc::::cccccloooooolc:,'..",
+    "              .',;;:::::;:loodxkOkkxxkdoccccc:;,'...",
+    "          ..,;;;:::::coxldKNWMMMMMMMMWNKkkdolcccc:;,..",
+    "       ..,;;;::;lxo:..:dXWMMMMMMMMMMWNKloOXNNNXOkoc:coo;.",
+    "    ..,;;;;;;:ldl'       ..'',;;;;;;,''.. ':dOXWWNOd::lkd,",
+    "  ..,;;;;;;:loc.      .';:clodxxxxdolc:;'.  ':lxO0X0l,cxo.",
+    "..',;;;;;;cooc.   .,:ldk0NWMMMMMMMMWN0kdl:,.   ,ddxO0occl:.",
+    ".;;;;;;;:odc. .;cldk0NWMMMMMMMMMMMMMMWN0kdlc;. .cxxkkkdl:..",
+    ",;;;;;;:dxolcox0NWMMMMMMMMMMMMMMMMMMMMMMWN0xo:.;looolllol;.",
+    ";;;;;;:lcloolldOKNWMMMMMMMMMMMMMMMMMMMMMMWNKOdlc;clc:;;;;;;;.",
+    ";;;;;;;:::::;;cccc:;,'..';:clodddolc:;'..',;:cccc:;;;;;;;;;;;.",
+    ".;;;;;;...''',;;;::cccccllllooooclllllccc:c:;;;,''.......;;;;;;;.",
+    "  ..'',;;;;;::::ccccccclllloooocllllcccc::;;,''............''...",
+    "      ....'',;;;;;;;;;;;;;;;;;;;;;;;;;;;;,''....",
+    "            .............................."
+  ],
+
+  closed: [
+    "                      ...'',;;:cccccccc:;;,''...",
+    "                 ..,;;::cccc::::cccccloooooolc:,'..",
+    "              .',;;:::::;:loodxkOkkxxkdoccccc:;,'...",
+    "          ..,;;;:::::coxldKNWMMMMMMMMWNKkkdolcccc:;,..",
+    "       ..,;;;::;lxo:..:dXWMMMMMMMMMMWNKloOXNNNXOkoc:coo;.",
+    "    ..,;;;;;;:ldl'          ........       ':dOXWWNOd::lkd,",
+    "  ..,;;;;;;:loc.      ..,;;::::::::;;,..     ':lxO0X0l,cxo.",
+    "..',;;;;;;cooc.   .,;:cloodddddddddoolc:;,.     ,ddxO0occl:.",
+    ".;;;;;;;:odc. .,;cldxkO00000000000000Okxdlc;,.  .cxxkkkdl:..",
+    ",;;;;;;:dxolc;:ldk0NWWMMMMMMMMMMMMMMMMWWN0kdl:;.;looolllol;.",
+    ";;;;;;:lcloolcloxOKNWMMMMMMMMMMMMMMMMMMWNKOxolc;.;clc:;;;;;;;.",
+    ";;;;;;;:::::;;cccc:;;,,''..........'',;;:cccc:;;;;;;;;;;;;;;;;.",
+    ".;;;;;;...''',;;;::cccccllllooooclllllccc:c:;;;,''.......;;;;;;;.",
+    "  ..'',;;;;;::::ccccccclllloooocllllcccc::;;,''............''...",
+    "      ....'',;;;;;;;;;;;;;;;;;;;;;;;;;;;;,''....",
+    "            .............................."
+  ]
+};
+
+const frameNames =
+  Object.keys(rawFrames);
+
+const frameHeight =
+  Math.max(
+    ...frameNames.map(
+      name =>
+        rawFrames[name].length
+    )
+  );
+
+const frameWidth =
+  Math.max(
+    ...frameNames.flatMap(
+      name =>
+        rawFrames[name].map(
+          line =>
+            line.length
         )
-      });
-    }
+    )
+  );
 
-    /*
-    Track mouse movement on desktop.
-    */
-    window.addEventListener(
-      "mousemove",
-      event => {
-        mouse.x = event.clientX;
-        mouse.y = event.clientY;
-        mouse.active = true;
-      }
+function normalizeFrame(lines) {
+  const output = [];
+
+  for (
+    let row = 0;
+    row < frameHeight;
+    row++
+  ) {
+    const line =
+      lines[row] || "";
+
+    const remaining =
+      frameWidth -
+      line.length;
+
+    const leftPadding =
+      Math.floor(
+        remaining / 2
+      );
+
+    const rightPadding =
+      remaining -
+      leftPadding;
+
+    output.push(
+      " ".repeat(leftPadding) +
+      line +
+      " ".repeat(rightPadding)
     );
+  }
 
-    /*
-    Also works when dragging a finger around on mobile.
-    */
-    window.addEventListener(
-      "touchmove",
-      event => {
-        const touch = event.touches[0];
+  return output.join("\n");
+}
 
-        if (!touch) return;
+const frames = {};
 
-        mouse.x = touch.clientX;
-        mouse.y = touch.clientY;
-        mouse.active = true;
-      },
-      { passive: true }
+for (const name of frameNames) {
+  frames[name] =
+    normalizeFrame(
+      rawFrames[name]
     );
+}
 
-    function shortestAngleDifference(
-      currentAngle,
-      targetAngle
+let currentDirection =
+  "center";
+
+let blinking = false;
+let looking = false;
+
+asciiEye.textContent =
+  frames.center;
+
+function displayFrame(
+  name,
+  flicker = false
+) {
+  if (flicker) {
+    asciiEye.classList.add(
+      "flicker"
+    );
+  }
+
+  asciiEye.textContent =
+    frames[name];
+
+  setTimeout(
+    () => {
+      asciiEye.classList.remove(
+        "flicker"
+      );
+    },
+    55
+  );
+}
+
+function scheduleNextLook() {
+  setTimeout(
+    lookAround,
+    700 +
+    Math.random() *
+    2200
+  );
+}
+
+function lookAround() {
+  if (blinking || looking) {
+    scheduleNextLook();
+    return;
+  }
+
+  looking = true;
+
+  const sequences = [
+    ["left"],
+    ["right"],
+    ["left", "center"],
+    ["right", "center"],
+    ["left", "right"],
+    ["right", "left"],
+    ["left", "center", "right"],
+    ["right", "center", "left"]
+  ];
+
+  const sequence =
+    sequences[
+      Math.floor(
+        Math.random() *
+        sequences.length
+      )
+    ];
+
+  let step = 0;
+
+  function runStep() {
+    if (
+      blinking ||
+      step >= sequence.length
     ) {
-      let difference =
-        targetAngle - currentAngle;
-
-      while (difference > 180) {
-        difference -= 360;
-      }
-
-      while (difference < -180) {
-        difference += 360;
-      }
-
-      return difference;
+      looking = false;
+      scheduleNextLook();
+      return;
     }
 
-    function animate(time) {
-      for (const eye of eyes) {
-        /*
-        Continue normal bouncing movement.
-        */
-        eye.x += eye.velocityX;
-        eye.y += eye.velocityY;
+    currentDirection =
+      sequence[step];
 
-        const maxX =
-          window.innerWidth - eye.size;
+    displayFrame(
+      currentDirection,
+      true
+    );
 
-        const maxY =
-          window.innerHeight - eye.size;
+    step++;
 
-        if (eye.x <= 0) {
-          eye.x = 0;
-          eye.velocityX =
-            Math.abs(eye.velocityX);
-        }
+    setTimeout(
+      runStep,
+      100 +
+      Math.random() *
+      150
+    );
+  }
 
-        if (eye.x >= maxX) {
-          eye.x = maxX;
-          eye.velocityX =
-            -Math.abs(eye.velocityX);
-        }
+  runStep();
+}
 
-        if (eye.y <= 0) {
-          eye.y = 0;
-          eye.velocityY =
-            Math.abs(eye.velocityY);
-        }
+function scheduleNextBlink() {
+  setTimeout(
+    blink,
+    1800 +
+    Math.random() *
+    4300
+  );
+}
 
-        if (eye.y >= maxY) {
-          eye.y = maxY;
-          eye.velocityY =
-            -Math.abs(eye.velocityY);
-        }
+function blink() {
+  if (blinking) {
+    scheduleNextBlink();
+    return;
+  }
 
-        const floatingY =
-          Math.sin(
-            time * eye.floatSpeed +
-            eye.floatOffset
-          ) * eye.floatAmount;
+  blinking = true;
 
-        /*
-        Find the center of this individual eye.
-        */
-        const eyeCenterX =
-          eye.x + eye.size / 2;
+  displayFrame("halfBlink");
 
-        const eyeCenterY =
-          eye.y +
-          floatingY +
-          eye.size / 2;
+  setTimeout(
+    () => {
+      displayFrame("closed");
+    },
+    80
+  );
 
-        /*
-        Calculate the angle between the eye and cursor.
-        */
-        const cursorAngle =
-          Math.atan2(
-            mouse.y - eyeCenterY,
-            mouse.x - eyeCenterX
-          ) * 180 / Math.PI;
+  setTimeout(
+    () => {
+      displayFrame("halfBlink");
+    },
+    165
+  );
 
-        const angleDifference =
-          shortestAngleDifference(
-            eye.currentLookAngle,
-            cursorAngle
-          );
+  setTimeout(
+    () => {
+      displayFrame(
+        currentDirection
+      );
 
-        eye.currentLookAngle +=
-          angleDifference * LOOK_SPEED;
+      blinking = false;
 
-        eye.element.style.transform = `
-          translate3d(
-            ${eye.x}px,
-            ${eye.y + floatingY}px,
-            0
-          )
-          rotate(${eye.currentLookAngle}deg)
-        `;
+      if (Math.random() < 0.2) {
+        setTimeout(
+          blink,
+          170
+        );
+      } else {
+        scheduleNextBlink();
       }
+    },
+    250
+  );
+}
 
-      requestAnimationFrame(animate);
-    }
+function moveWholeAsciiEye() {
+  const x =
+    47 +
+    Math.random() *
+    6;
 
-    for (let i = 0; i < EYE_COUNT; i++) {
-      createEye();
-    }
+  const y =
+    49 +
+    Math.random() *
+    7;
 
-    window.addEventListener("resize", () => {
-      mouse.x = window.innerWidth / 2;
-      mouse.y = window.innerHeight / 2;
+  asciiEye.style.left =
+    `${x}%`;
 
-      for (const eye of eyes) {
-        eye.x = Math.min(
+  asciiEye.style.top =
+    `${y}%`;
+
+  setTimeout(
+    moveWholeAsciiEye,
+    2500 +
+    Math.random() *
+    3000
+  );
+}
+
+const statusMessages = [
+  "OPTICAL FEED: ACTIVE<br>SUBJECT: DETECTED",
+
+  "TRACKING: ENABLED<br>FOCUS: LOCKED",
+
+  "MOVEMENT: DETECTED<br>AWAITING INPUT",
+
+  "VISUAL LINK: STABLE<br>WATCHER: ONLINE"
+];
+
+function updateStatus() {
+  terminalStatus.innerHTML =
+    statusMessages[
+      Math.floor(
+        Math.random() *
+        statusMessages.length
+      )
+    ];
+
+  setTimeout(
+    updateStatus,
+    1800 +
+    Math.random() *
+    2500
+  );
+}
+
+/* Keep floating eyes inside the resized screen. */
+
+window.addEventListener(
+  "resize",
+  () => {
+    mouse.x =
+      window.innerWidth / 2;
+
+    mouse.y =
+      window.innerHeight / 2;
+
+    for (const eye of floatingEyes) {
+      eye.x =
+        Math.min(
           eye.x,
           Math.max(
             0,
-            window.innerWidth - eye.size
+            window.innerWidth -
+            eye.size
           )
         );
 
-        eye.y = Math.min(
+      eye.y =
+        Math.min(
           eye.y,
           Math.max(
             0,
-            window.innerHeight - eye.size
+            window.innerHeight -
+            eye.size
           )
         );
-      }
-    });
+    }
+  }
+);
 
-    requestAnimationFrame(animate);
-  </script>
+/* Start everything. */
+
+scheduleNextLook();
+scheduleNextBlink();
+
+setTimeout(
+  moveWholeAsciiEye,
+  1200
+);
+
+setTimeout(
+  updateStatus,
+  1500
+);
+
+requestAnimationFrame(
+  animateFloatingEyes
+);
+</script>
 
 </body>
 </html>
